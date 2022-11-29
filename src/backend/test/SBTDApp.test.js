@@ -71,9 +71,9 @@ describe("Soul", async function(){
         });
     })
 
-    describe("Making SBT Items", function(){
+    /* describe("Making SBT Items", function(){
         it("Should track newly created item, assume SBT ownership and emit Offered event", async function(){
-            await expect(soul.connect(addr1).mintSBT(sbt, soul.address))
+            await expect(soul.mintSBT(sbt.address, soul.address))
                 .to.emit(soul, "Offered")
                 .withArgs(
                     1,
@@ -82,5 +82,56 @@ describe("Soul", async function(){
                     addr1
                 )
         });
+    }) */
+})
+
+describe("SoulHub", async function() {
+    let deployer, addr1, addr2, sbt, soul, soulHub;
+    let URI = "Sample URI";
+    let fee = toWei(0.0021);
+
+    beforeEach(async function(){
+        const SBT = await ethers.getContractFactory("SBT");
+        const Soul = await ethers.getContractFactory("Soul");
+        const SoulHub = await ethers.getContractFactory("SoulHub");
+        const soulName = "education";
+
+        //Get signers
+        [deployer, addr1, addr2] = await ethers.getSigners();
+
+        //Deploy contract
+        sbt = await SBT.deploy();
+        soul = await Soul.deploy(soulName);
+        soulHub = await SoulHub.deploy(fee);
+    })
+
+    describe("Deployment", function() {
+        it("Should track feeAccount and fee of the application", async function() {
+            expect(await soulHub.feeAccount()).to.equal(deployer.address);
+            expect(await soulHub.fee()).to.equal(fee);
+        })
+    })
+
+    describe("SoulName and GasTransfer", async function() {
+        it("Should track the name of the created soul", async function() {
+            expect(await soulHub.getSoulName(soul.address)).to.equal("education")
+        })
+
+        it("Should track if the gas is being transferred", async function() {
+            expect(await soulHub.transferGas())
+        })
+    })
+
+    describe("Make soul", async function() {
+        it("Should track the creation of a soul", async function() {
+            console.log("fee ", soulHub.feeAccount())
+            expect(await soulHub.connect(deployer).makeSoul(soul.address))
+            .to.emit(soulHub, "CreatedSoul")
+            .withArgs(
+                1,
+                soul.address,
+                deployer
+            )
+        })
     })
 })

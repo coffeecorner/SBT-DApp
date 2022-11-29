@@ -72,7 +72,7 @@ contract Soul is ReentrancyGuard {
         itemCount++;
 
         //transfer sbt
-        _sbt.transferFrom(msg.sender, _mintee, item);
+        _sbt.transferFrom(msg.sender, _mintee, itemCount);
 
         //add new item to items mapping
         items[itemCount] = Item (
