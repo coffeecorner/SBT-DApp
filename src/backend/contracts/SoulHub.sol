@@ -8,20 +8,18 @@ import "./Soul.sol";
 contract SoulHub is ReentrancyGuard {
     //state variables
     address payable public immutable feeAccount; //the account that receives fees
-    uint public immutable feePercent; //the fee percentage on sales
+    uint public immutable fee; //the fee percentage on sales
     uint public soulCount;
     
     struct soulItem {
-         uint soulItemId;
-         Soul soul;
          uint soulId;
+         Soul soul;
          address minter;
     }
 
     event CreatedSoul(
-        uint soulItemId, 
-        address indexed soul,
         uint soulId,
+        address indexed soul,
         address indexed minter
     );
 
@@ -29,13 +27,12 @@ contract SoulHub is ReentrancyGuard {
      //itemId -> Item
      mapping (uint => soulItem) public soulWallet;
 
-    constructor(uint _feePercent){
+    constructor(uint _fee){
         feeAccount = payable(msg.sender);
-        feePercent = _feePercent;
+        fee = _fee;
     }
 
-    function makeSoul(Soul _soul, uint _soulId) external nonReentrant{
-        //require(_price>0,"Price must be greater than zero");
+    function makeSoul(Soul _soul) external nonReentrant{
 
         //increment soulCount
         soulCount++;
@@ -44,7 +41,6 @@ contract SoulHub is ReentrancyGuard {
         soulWallet[soulCount] = soulItem (
             soulCount,
             _soul,
-            _soulId,
             msg.sender
         );
 
@@ -52,7 +48,6 @@ contract SoulHub is ReentrancyGuard {
         emit CreatedSoul(
             soulCount, 
             address(_soul),
-            _soulId,
             msg.sender
         );
     }
@@ -62,4 +57,26 @@ contract SoulHub is ReentrancyGuard {
         return currentSoul.getSoulName();
     }
 
+    function makeSoul(uint _soulId, IERC721 _sbt) public {
+
+        soulItem memory soulitem = soulWallet[_soulId];
+        address _soulAddress = address(soulitem.soul);
+        soulitem.soul.mintSBT(_sbt, _soulAddress);
+
+        transferGas(feeAccount);
+    }
+
+    function makeSoulFor(uint _soulId, IERC721 _sbt, address _mintee) public {
+        
+        soulItem memory soulitem = soulWallet[_soulId];
+        address _soulAddress = address(soulitem.soul);
+        soulitem.soul.mintSBTFor(_sbt, _mintee, _soulAddress);
+
+        transferGas(feeAccount);
+
+    }
+
+    function transferGas(address payable to) public {
+        to.transfer(fee);
+    }
 }

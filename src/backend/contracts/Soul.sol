@@ -11,26 +11,23 @@ contract Soul is ReentrancyGuard {
     uint public itemCount;
     
     struct Item {
-         uint itemId;
+         uint tokenId;
          IERC721 sbt;
          address soul;
-         uint tokenId;
          address payable minter;
     }
 
     event Offered(
-        uint itemId, 
-        address indexed sbt,
-        address indexed soul,
         uint tokenId,
-        address indexed minter
+        address indexed sbt,
+        address soul,
+        address minter
     );
 
     event Received(
-        uint itemId,
+        uint tokenId,
         address indexed sbt,
         address soul,
-        uint tokenId,
         address minter,
         address mintee
     );
@@ -46,21 +43,17 @@ contract Soul is ReentrancyGuard {
         return soulName;
     }
 
-    function makeItem(IERC721 _sbt, uint _tokenId, address _soul) external nonReentrant{
+    function mintSBT(IERC721 _sbt, address _soul) public nonReentrant{
         //require(_price>0,"Price must be greater than zero");
 
         //increment itemCount
         itemCount++;
-
-        //transfer sbt
-        _sbt.transferFrom(msg.sender, address(this), _tokenId);
 
         //add new item to items mapping
         items[itemCount] = Item (
             itemCount,
             _sbt,
             _soul,
-            _tokenId,
             payable(msg.sender)
         );
 
@@ -69,25 +62,23 @@ contract Soul is ReentrancyGuard {
             itemCount,
             address(_sbt),
             _soul,
-            _tokenId,
             msg.sender
         );
     }
 
-    function mintSBTFor(IERC721 _sbt, uint _tokenId, address _mintee, address _soul) external nonReentrant{
+    function mintSBTFor(IERC721 _sbt, address _mintee, address _soul) public nonReentrant{
         
         //increment itemCount
         itemCount++;
 
         //transfer sbt
-        _sbt.transferFrom(msg.sender, _mintee, _tokenId);
+        _sbt.transferFrom(msg.sender, _mintee, item);
 
         //add new item to items mapping
         items[itemCount] = Item (
             itemCount,
             _sbt,
             _soul,
-            _tokenId,
             payable(msg.sender)
         );
 
@@ -96,7 +87,6 @@ contract Soul is ReentrancyGuard {
             itemCount,
             address(_sbt),
             address(_soul),
-            _tokenId,
             msg.sender
         );
 
@@ -105,7 +95,6 @@ contract Soul is ReentrancyGuard {
             itemCount,
             address(_sbt),
             address(_soul),
-            _tokenId,
             msg.sender,
             _mintee
         );
