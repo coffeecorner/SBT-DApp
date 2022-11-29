@@ -15,124 +15,51 @@ contract SoulHub is ReentrancyGuard {
          uint soulItemId;
          Soul soul;
          uint soulId;
-         address payable minter;
+         address minter;
     }
 
-    event Offered(
-        uint itemId, 
-        address indexed sbt,
-        uint tokenId,
+    event CreatedSoul(
+        uint soulItemId, 
+        address indexed soul,
+        uint soulId,
         address indexed minter
     );
 
-    event Received(
-        uint itemId,
-        address indexed sbt,
-        uint tokenId,
-        address indexed minter,
-        address indexed mintee
-    );
-
-    event AccessReceived();
-    event AccessGranted();
-    event AccesssRevoked();
 
      //itemId -> Item
-     mapping (uint => soulWallet) public souls;
+     mapping (uint => soulItem) public soulWallet;
 
     constructor(uint _feePercent){
         feeAccount = payable(msg.sender);
         feePercent = _feePercent;
     }
 
-    function makeItem(IERC721 _sbt, uint _tokenId) external nonReentrant{
+    function makeSoul(Soul _soul, uint _soulId) external nonReentrant{
         //require(_price>0,"Price must be greater than zero");
 
-        //increment itemCount
-        itemCount++;
-
-        //transfer sbt
-        _sbt.transferFrom(msg.sender, address(this), _tokenId);
+        //increment soulCount
+        soulCount++;
 
         //add new item to items mapping
-        items[itemCount] = Item (
-            itemCount,
-            _sbt,
-            _tokenId,
-            payable(msg.sender)
+        soulWallet[soulCount] = soulItem (
+            soulCount,
+            _soul,
+            _soulId,
+            msg.sender
         );
 
         //emit Offered event
-        emit Offered(
-            itemCount,
-            address(_sbt),
-            _tokenId,
+        emit CreatedSoul(
+            soulCount, 
+            address(_soul),
+            _soulId,
             msg.sender
         );
     }
 
-    function purchaseItem(uint _itemId) external payable nonReentrant{
-        uint _totalPrice = getTotalPrice(_itemId);
-        Item storage item = items[_itemId];
-        require(_itemId > 0 && _itemId <= itemCount, "item doesn't exist");
-        require(msg.value >= _totalPrice, "not enough ether to cover item price");
-        require(!item.sold, "item already sold");
-
-        //pay seller and feeAccount
-        item.seller.transfer(item.price);
-        feeAccount.transfer(_totalPrice - item.price);
-
-        //update item to sold
-        item.sold = true;
-
-        //transfer sbt to buyer
-        item.sbt.transferFrom(address(this), msg.sender,item.tokenId);
-
-        //emit Bought event
-        emit Received(
-            _itemId,
-            address(item.sbt),
-            item.tokenId,
-            item.seller,
-            msg.sender
-        );
+    function getSoulName(address _soulAddress) view public returns(string memory){
+        Soul currentSoul = Soul(_soulAddress);
+        return currentSoul.getSoulName();
     }
 
-    function mintSBTFor(IERC721 _sbt, uint _tokenId, address indexed _mintee) external nonReentrant{
-        
-        //increment itemCount
-        itemCount++;
-
-        //transfer sbt
-        _sbt.transferFrom(msg.sender, address(this), _tokenId);
-
-        //add new item to items mapping
-        items[itemCount] = Item (
-            itemCount,
-            _sbt,
-            _tokenId,
-            payable(msg.sender)
-        );
-
-        //emit Offered event
-        emit Offered(
-            itemCount,
-            address(_sbt),
-            _tokenId,
-            msg.sender
-        );
-
-        //emit Received event
-        emit Received(
-            itemCount,
-            address(_sbt),
-            _tokenId,
-            msg.sender,
-            _mintee
-        );
-    }
-
-    function getTotalPrice(uint _itemId) view public returns(uint){
-        return(items[_itemId].price*(100+feePercent)/100);
-    }
 }
