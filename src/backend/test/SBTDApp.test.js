@@ -45,6 +45,11 @@ describe("SBT", async function(){
             expect(await sbt.balanceOf(addr2.address)).to.equal(1);
             expect(await sbt.tokenURI(2)).to.equal(URI);
         })
+
+        it("Should track the owner of the newly created SBT", async function (){
+            await sbt.connect(addr1).mint(URI);
+            expect(await sbt.ownerOf(1)).to.equal(addr1.address);
+        })
     });
 }) 
 
@@ -63,6 +68,11 @@ describe("Soul", async function(){
         //Deploy contract
         sbt = await SBT.deploy();
         soul = await Soul.deploy(soulName);
+
+        //addr1 mints an sbt
+        await sbt.connect(addr1).mint(URI)
+        //add1 approves soul
+        await sbt.connect(addr1).setApprovalForAll(soul.address, true)
     })
 
     describe("Deployment", function(){
@@ -71,18 +81,37 @@ describe("Soul", async function(){
         });
     })
 
-    /* describe("Making SBT Items", function(){
+    describe("Making SBT Items", function(){
         it("Should track newly created item, assume SBT ownership and emit Offered event", async function(){
-            await expect(soul.mintSBT(sbt.address, soul.address))
+            await expect(soul.connect(addr1).mintSBT(sbt.address, soul.address))
                 .to.emit(soul, "Offered")
                 .withArgs(
                     1,
                     sbt.address,
                     soul.address,
-                    addr1
+                    addr1.address,
                 )
         });
-    }) */
+
+        it("Should track newly minted objects for another party, transfer ownership and emit Offered and Received events", async function(){
+            await expect(soul.connect(addr1).mintSBTFor(sbt.address, addr2.address, soul.address))
+            .to.emit(soul, "Offered")
+            .withArgs(
+                1,
+                sbt.address,
+                soul.address,
+                addr1.address
+            )
+            .to.emit(soul, "Received")
+            .withArgs(
+                1,
+                sbt.address,
+                soul.address,
+                addr1.address,
+                addr2.address
+            )
+        })
+    })
 })
 
 describe("SoulHub", async function() {
@@ -124,13 +153,12 @@ describe("SoulHub", async function() {
 
     describe("Make soul", async function() {
         it("Should track the creation of a soul", async function() {
-            console.log("fee ", soulHub.feeAccount())
-            expect(await soulHub.connect(deployer).makeSoul(soul.address))
+            expect(await soulHub.connect(addr1).makeSoul(soul.address))
             .to.emit(soulHub, "CreatedSoul")
             .withArgs(
                 1,
                 soul.address,
-                deployer
+                addr1.address
             )
         })
     })
