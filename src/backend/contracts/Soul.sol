@@ -71,12 +71,6 @@ contract Soul is ReentrancyGuard {
         //increment itemCount
         itemCount++;
 
-        //get Item
-        Item storage item = items[itemCount];
-
-        //transfer sbt
-        item.sbt.transferFrom(msg.sender, _mintee, itemCount);
-
         //add new item to items mapping
         items[itemCount] = Item (
             itemCount,
@@ -84,6 +78,12 @@ contract Soul is ReentrancyGuard {
             _soul,
             payable(msg.sender)
         );
+
+        //get Item
+        Item storage item = items[itemCount];
+
+        //transfer sbt
+        item.sbt.transferFrom(msg.sender, _mintee, itemCount);
 
         //emit Offered event
         emit Offered(
@@ -102,5 +102,7 @@ contract Soul is ReentrancyGuard {
             _mintee
         );
     }
+
+    
 
 }

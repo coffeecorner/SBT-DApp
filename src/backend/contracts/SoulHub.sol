@@ -57,20 +57,31 @@ contract SoulHub is ReentrancyGuard {
         return currentSoul.getSoulName();
     }
 
-    function makeSBT(uint _soulId, IERC721 _sbt) public {
-
+   /*  function getAddress(uint _soulId) public returns(address){
         soulItem memory soulitem = soulWallet[_soulId];
-        address _soulAddress = address(soulitem.soul);
-        soulitem.soul.mintSBT(_sbt, _soulAddress);
+        Soul soul = soulitem.soul;
+
+        //Soul.Item memory soulMappingItem = soul.items[_soulId];
+        return address(soul.soul);
+    } */
+
+    function makeSBT(address _soulAddress, IERC721 _sbt) public {
+
+        /* soulItem memory soulitem = soulWallet[_soulId];
+        Soul soul = soulitem.soul;
+        address _soulAddress = address(soul); */
+        Soul currentSoul = Soul(_soulAddress);
+        currentSoul.mintSBT(_sbt, _soulAddress);
 
         transferGas();
     }
 
-    function makeSBTFor(uint _soulId, IERC721 _sbt, address _mintee) public {
+    function makeSBTFor(address _soulAddress, IERC721 _sbt, address _mintee) public {
         
-        soulItem memory soulitem = soulWallet[_soulId];
-        address _soulAddress = address(soulitem.soul);
-        soulitem.soul.mintSBTFor(_sbt, _mintee, _soulAddress);
+       /*  soulItem memory soulitem = soulWallet[_soulId];
+        address _soulAddress = address(soulitem.soul); */
+        Soul currentSoul = Soul(_soulAddress);
+        currentSoul.mintSBTFor(_sbt, _mintee, _soulAddress);
 
         transferGas();
 

@@ -132,6 +132,12 @@ describe("SoulHub", async function() {
         sbt = await SBT.deploy();
         soul = await Soul.deploy(soulName);
         soulHub = await SoulHub.deploy(fee);
+
+        //addr1 mints an sbt
+        await sbt.connect(addr1).mint(URI)
+        //add1 approves soul
+        await sbt.connect(addr1).setApprovalForAll(soul.address, true)
+        await sbt.connect(addr1).setApprovalForAll(soulHub.address, true)
     })
 
     describe("Deployment", function() {
@@ -149,6 +155,12 @@ describe("SoulHub", async function() {
         it("Should track if the gas is being transferred", async function() {
             expect(await soulHub.transferGas())
         })
+
+        /* it("Should return address of a soul using soulId", async function(){
+            console.log("function output:\n",await soulHub.getAddress(1))
+            console.log("soul addr output:\n",soul.address)
+            expect(await soulHub.getAddress(1)).to.equal(soul.address)
+        }) */
     })
 
     describe("Make soul", async function() {
@@ -162,4 +174,15 @@ describe("SoulHub", async function() {
             )
         })
     })
+
+/*     describe("Mint SBT Item", async function() {
+        it("Should mint SBT items for the user,assign ownership and transfer Gas fees", async function(){
+            expect(await soulHub.connect(addr1).makeSBT(soul.address, sbt.address))
+        })
+
+        it("Should mint SBT items for another user, transfer ownership and transfer Gas fees", async function(){
+            await soul.connect(addr1)
+            expect(await soulHub.connect(addr1).makeSBTFor(soul.address, sbt.address, addr2.address))
+        })
+    }) */
 })
