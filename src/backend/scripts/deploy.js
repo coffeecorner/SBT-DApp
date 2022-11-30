@@ -3,6 +3,7 @@ const { ethers, artifacts } = require("hardhat");
 async function main() {
 
   const [deployer] = await ethers.getSigners();
+  const toWei = (num) => ethers.utils.parseEther(num.toString());
 
   console.log("Deploying contracts with the account:", deployer.address);
   console.log("Account balance:", (await deployer.getBalance()).toString());
@@ -10,15 +11,22 @@ async function main() {
   // deploy contracts here:
   const SBT = await ethers.getContractFactory("SBT");
   const sbt = await SBT.deploy(); 
-  const Marketplace = await ethers.getContractFactory("Marketplace");
-  const marketplace = await Marketplace.deploy(1);
+
+  const Soul = await ethers.getContractFactory("Soul");
+  const soul = await Soul.deploy("Education");
+
+  let fee = toWei(0.0021);
+  const SoulHub = await ethers.getContractFactory("SoulHub");
+  const soulhub = await SoulHub.deploy(fee);
 
   console.log("SBT contract address: ", sbt.address);
-  console.log("Marketplace contract address: ", marketplace.address);
+  console.log("Soul contract address: ", soul.address);
+  console.log("SoulHub contract address: ", soulhub.address);
   
   // For each contract, pass the deployed contract and name to this function to save a copy of the contract ABI and address to the front end.
   saveFrontendFiles(sbt , "SBT");
-  saveFrontendFiles(marketplace, "Marketplace");
+  saveFrontendFiles(soul, "Soul");
+  saveFrontendFiles(soulhub, "SoulHub");
 }
 
 function saveFrontendFiles(contract, name) {
