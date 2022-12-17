@@ -36,6 +36,18 @@ contract Soul is ReentrancyGuard {
         return name;
     }
 
+    function getSoulCount() public view returns(uint) {
+        return soulCount;
+    }
+
+    function getSoulName(uint _soulId) public view returns (string memory){
+        return _soulNames[_soulId];
+    }
+
+    function getOwner(uint _soulId) public view returns (address){
+        return _owners[_soulId];
+    }
+
     function createSoul(string memory _soulName) public returns(uint){
         soulCount++;
 
