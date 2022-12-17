@@ -6,103 +6,52 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract Soul is ReentrancyGuard {
+
     //state variables
-    string public soulName;
-    uint public itemCount;
-    
-    struct Item {
-         uint tokenId;
-         IERC721 sbt;
-         address soul;
-         address payable minter;
+    uint public soulCount;
+
+    // Soul contract name
+    string private name;
+
+    // Mapping from soul ID to owner address
+    mapping(uint256 => address) private _owners;
+
+    // Mapping from soul ID to name of the soul
+    mapping(uint256 => string) _soulNames;
+
+    // Mapping owner address to the count of souls they own
+    //mapping(address => uint256) private _soulBalances;
+
+    constructor(string memory _name){
+        name = _name;
     }
 
-    event Offered(
-        uint tokenId,
-        address indexed sbt,
-        address soul,
-        address minter
+    event CreatedSoul(
+        uint soulId,
+        string soulName,
+        address indexed owner
     );
 
-    event Received(
-        uint tokenId,
-        address indexed sbt,
-        address soul,
-        address minter,
-        address mintee
-    );
-
-     //itemId -> Item
-     mapping (uint => Item) public items;
-
-    constructor(string memory _soulName){
-        soulName = _soulName;
+    function getSoulContractName() public view returns (string memory) {
+        return name;
     }
 
-    function getSoulName() public view returns (string memory) {
-        return soulName;
-    }
+    function createSoul(string memory _soulName) public returns(uint){
+        soulCount++;
 
-    function mintSBT(IERC721 _sbt, address _soul) public nonReentrant{
-        //require(_price>0,"Price must be greater than zero");
+        //update owner
+        _owners[soulCount] = msg.sender;
 
-        //increment itemCount
-        itemCount++;
+        //update name
+        _soulNames[soulCount] = _soulName;
 
-        //add new item to items mapping
-        items[itemCount] = Item (
-            itemCount,
-            _sbt,
-            _soul,
-            payable(msg.sender)
-        );
-
-        //emit Offered event
-        emit Offered(
-            itemCount,
-            address(_sbt),
-            _soul,
-            msg.sender
-        );
-    }
-
-    function mintSBTFor(IERC721 _sbt, address _mintee, address _soul) public nonReentrant{
-        
-        //increment itemCount
-        itemCount++;
-
-        //add new item to items mapping
-        items[itemCount] = Item (
-            itemCount,
-            _sbt,
-            _soul,
-            payable(msg.sender)
-        );
-
-        //get Item
-        Item storage item = items[itemCount];
-
-        //transfer sbt
-        item.sbt.transferFrom(msg.sender, _mintee, itemCount);
-
-        //emit Offered event
-        emit Offered(
-            itemCount,
-            address(_sbt),
-            address(_soul),
+        emit CreatedSoul(
+            soulCount,
+            _soulName,
             msg.sender
         );
 
-        //emit Received event
-        emit Received(
-            itemCount,
-            address(_sbt),
-            address(_soul),
-            msg.sender,
-            _mintee
-        );
+        return soulCount;
     }
-
-    
 
 }
