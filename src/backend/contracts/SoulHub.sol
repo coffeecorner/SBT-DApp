@@ -4,6 +4,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import "./Soul.sol";
+import "./SBT.sol";
 
 contract SoulHub is ReentrancyGuard {
     //state variables
@@ -28,7 +29,7 @@ contract SoulHub is ReentrancyGuard {
     //Item and events for SBT Item
     struct SBTItem {
          uint tokenId;
-         IERC721 sbt;
+         SBT sbt;
          uint soulItemId;
          address payable minter;
     }
@@ -50,6 +51,21 @@ contract SoulHub is ReentrancyGuard {
         address mintee
     );
 
+    event AccessGranted(
+        uint sbtId,
+        address indexed sbt,
+        uint sbtItemId,
+        address owner,
+        address receiver
+    );
+
+    event AccessRevoked(
+        uint sbtId,
+        address indexed sbt,
+        uint sbtItemId,
+        address owner,
+        address receiver
+    );
 
      //soulId -> soulItems
     mapping (uint => SoulItem) public _soulItems;
@@ -59,6 +75,12 @@ contract SoulHub is ReentrancyGuard {
 
     //soulId -> sbtCount
     mapping(uint => uint) public _soulContentCount;
+
+    //sbtId -> addresses allowed to access
+    mapping(uint => address[]) public _permittedUsers;
+
+    //address -> currently valid SBTs that particular user has access to
+    mapping(address => uint[]) public _activeSBTs;
 
     constructor(uint _fee){
         feeAccount = payable(msg.sender);
@@ -75,7 +97,7 @@ contract SoulHub is ReentrancyGuard {
     }
 
     //SBT operations
-    function createSBTItem(IERC721 _sbt, uint _sbtId, uint _soulId) public nonReentrant{
+    function createSBTItem(SBT _sbt, uint _sbtId, uint _soulId) public nonReentrant{
         //require the sbtId and sbtItemCount to line up
         require(_sbtId == sbtItemCount+1, "Invalid SBT Id number");
 
@@ -104,7 +126,7 @@ contract SoulHub is ReentrancyGuard {
         transferGas();
     } 
 
-    function createSBTItemFor(IERC721 _sbt, uint _sbtId, uint _soulId, address _mintee) public nonReentrant{
+    function createSBTItemFor(SBT _sbt, uint _sbtId, uint _soulId, address _mintee) public nonReentrant{
         //require the sbtId and sbtItemCount to line up
         require(_sbtId == sbtItemCount+1, "Invalid SBT Id number");
 
@@ -143,6 +165,73 @@ contract SoulHub is ReentrancyGuard {
         );
 
         transferGas();
+    }
+
+    //SBT accesses
+    function grantAccess(SBT _sbt, uint _sbtId, address _to) public nonReentrant{
+        require(_sbt.ownerOf(_sbtId)==msg.sender, "ERC5114: transfer caller is not owner nor approved");  
+
+        //update address of the receiver against the sbtId
+        _permittedUsers[_sbtId].push(_to);
+
+        //add sbtId to the caller's accessible tokens
+        _activeSBTs[_to].push(_sbtId);
+
+        emit AccessGranted(
+            _sbtId,
+            address(_sbt),
+            sbtItemCount,
+            msg.sender,
+            _to
+        );
+    }
+
+    function revokeAccess(SBT _sbt, uint _sbtId, address _user) public nonReentrant{
+        require(_sbt.ownerOf(_sbtId)==msg.sender, "ERC5114: transfer caller is not owner nor approved"); 
+
+        //remove address of the receiver against sbt permissions
+        for(uint i = 0; i < _permittedUsers[_sbtId].length; i++){
+            if(_permittedUsers[_sbtId][i] == _user){
+                _permittedUsers[_sbtId][i] = _permittedUsers[_sbtId][_permittedUsers[_sbtId].length - 1];
+                _permittedUsers[_sbtId].pop();
+            }
+        }
+
+        //remove sbtId from the caller's accessible tokens
+        for(uint i = 0; i < _activeSBTs[_user].length; i++){
+            if(_activeSBTs[_user][i] == _sbtId){
+                _activeSBTs[_user][i] = _activeSBTs[_user][_activeSBTs[_user].length - 1];
+                _activeSBTs[_user].pop();
+            }
+        }
+
+        emit AccessRevoked(
+            _sbtId,
+            address(_sbt),
+            sbtItemCount,
+            msg.sender,
+            _user
+        );
+    }
+
+    function checkAccess(uint _sbtId, address _user) public view returns(bool){
+        bool access = false;
+
+        //check address of receiver against sbt permissions
+        for(uint i = 0; i < _permittedUsers[_sbtId].length; i++){
+            if(_permittedUsers[_sbtId][i] == _user){
+               access = true;
+            }
+        }
+
+        //check sbtId against caller's accessible tokens
+        for(uint i = 0; i < _activeSBTs[_user].length; i++){
+            if(_activeSBTs[_user][i] == _sbtId){
+                access = true && access;
+            }
+        }
+
+        return access;        
     }
 
     //Soul Operations

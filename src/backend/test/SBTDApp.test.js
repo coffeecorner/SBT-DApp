@@ -159,7 +159,7 @@ describe("SoulHub", async function() {
     })
 
     describe("Soul Item creation", function(){
-        it("Should tract the creation of a soul", async function() {
+        it("Should track the creation of a soul", async function() {
             expect(await soulHub.connect(addr1).createSoulItem(soul.address, 1))
             .to.emit(soulHub, "CreatedSoul")
             .withArgs(1,soul.address,addr1.address)
@@ -184,6 +184,32 @@ describe("SoulHub", async function() {
 
             expect(await soulHub.getSoulContentCount(1)).to.equal(1);
             expect(await soulHub.getSoulContentCount(2)).to.equal(2);
+        })
+    })
+
+    describe("Access permission tracking", function(){
+        it("Should be able to grant and check access permission", async function(){
+            await soulHub.connect(addr1).createSBTItem(sbt.address, 1, 1)
+
+            expect(await soulHub.connect(addr1).grantAccess(sbt.address, 1, addr2.address))
+            .to.emit(soulHub, "AccessGranted")
+            .withArgs(1, sbt.address, 1, addr1.address, addr2.address)
+
+            expect(await soulHub.connect(addr1).checkAccess(1, addr2.address)).to.equal(true);
+        })
+
+        it("Should be able to revoke and check access permission", async function(){
+            await soulHub.connect(addr1).createSBTItem(sbt.address, 1, 1)
+
+            expect(await soulHub.connect(addr1).grantAccess(sbt.address, 1, addr2.address))
+            .to.emit(soulHub, "AccessGranted")
+            .withArgs(1, sbt.address, 1, addr1.address, addr2.address)
+
+            expect(await soulHub.connect(addr1).revokeAccess(sbt.address, 1, addr2.address))
+            .to.emit(soulHub, "AccessRevoked")
+            .withArgs(1, sbt.address, 1, addr1.address, addr2.address)
+
+            expect(await soulHub.connect(addr1).checkAccess(1, addr2.address)).to.equal(false);
         })
     })
 })

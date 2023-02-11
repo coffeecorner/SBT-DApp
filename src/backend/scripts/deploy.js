@@ -13,7 +13,7 @@ async function main() {
   const sbt = await SBT.deploy(); 
 
   const Soul = await ethers.getContractFactory("Soul");
-  const soul = await Soul.deploy("Education");
+  const soul = await Soul.deploy("Soul");
 
   let fee = toWei(0.0021);
   const SoulHub = await ethers.getContractFactory("SoulHub");
