@@ -93,7 +93,8 @@ contract SoulHub is ReentrancyGuard {
     }
 
     function transferGas() public payable {
-        feeAccount.send(fee);
+        bool sent = feeAccount.send(fee);
+        require(sent, "Ether not transferred!!!");
     }
 
     //SBT operations
