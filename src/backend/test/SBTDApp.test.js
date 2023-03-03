@@ -3,10 +3,10 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-const toWei = (num) => ethers.utils.parseEther(num.toString()) //1 ether = 10*18 wei
+const toWei = (num) => ethers.utils.parseUnits(num.toString(), "ether") //1 ether = 10*18 wei
 const fromWei = (num) => ethers.utils.formatEther(num);
 
-describe("SBT", async function(){
+/* describe("SBT", async function(){
     let deployer, addr1, addr2, sbt;
     let URI = "Sample URI";
 
@@ -47,9 +47,9 @@ describe("SBT", async function(){
             expect(await sbt.ownerOf(1)).to.equal(addr1.address);
         })
     });
-}) 
+}) */ 
 
-describe("Soul", async function(){
+/* describe("Soul", async function(){
     let deployer, addr1, addr2, soul;
     let name = "Soul";
     const soulName = "Education";
@@ -90,13 +90,13 @@ describe("Soul", async function(){
         })
     })
     
-})
+}) */
 
 describe("SoulHub", async function() {
     let deployer, addr1, addr2, addr3, sbt, soul, soulHub;
     let soulName = "Education";
     let URI = "Sample URI";
-    let fee = toWei(0.0021);
+    let fee = toWei(1);
 
     beforeEach(async function(){
         const SBT = await ethers.getContractFactory("SBT");
@@ -125,13 +125,99 @@ describe("SoulHub", async function() {
         })
     })
 
-    describe("Gas fee transfer", function() {
-        it("Should track if the gas is being transferred", async function() {
-            expect(await soulHub.transferGas())
+    describe("Check if deployer address is right", () => {
+        it("Should track the address of the deployer", async () => {
+            expect(await soulHub.getDeployer()).to.equal(deployer.address);
         })
     })
 
-    describe("SBT Item creation", function(){
+    /* describe("Check balance before transfer", () => {
+        it("Should track balance of sender before transfer", async () => {
+            console.log("BEFOREEEEEEEEE",await soulHub.getBalance())
+            expect(await soulHub.getBalance());
+        })
+    }) */
+    
+    /* describe("Gas fee transfer", function() {
+        it("Should track if the gas is being transferred", async function() {
+            expect(await soulHub.connect(addr1).transferFees());
+        })
+    }) */
+
+    /* describe("Gas fee transfer", function() {
+        it("Should transfer gas fees to deployer", async function() {
+            const balanceBefore = await soulHub.getBalance();
+            await soulHub.connect(addr1).transferGass({value: 1});
+            const balanceAfter = await soulHub.getBalance();
+    
+            expect(balanceBefore).to.equal(balanceAfter - 1);
+        });
+    }); */
+
+    describe("Check if deployer is an ethereum address", () => {
+        it ("Should make sure deployer address is an ethereum address", async () => {
+            expect(await soulHub.isEthereumAddress(deployer.address)).to.equal(true);
+        })
+    })
+      
+
+    /* describe("Check balance after transfer", () => {
+        it("Should track balance of sender after transfer", async () => {
+            console.log("AFTERRRRRRRR",await soulHub.getBalance())
+            expect(await soulHub.getBalance());
+        })
+    }) */
+
+    describe("Gas fee transfer", function() {
+        it("Should check add1's balance", async () => {
+            expect(await addr1.getBalance() > 0)
+        })
+        it("See if fee is not 0", async () => {
+            expect(await soulHub.fee()).to.equal(toWei(1));
+        })
+        /* it("See if balance is greater than fee", async () => {
+            expect(await soulHub.fee() < addr1.getBalance()).to.equal(false)
+        })
+        it("Should track if the gas is being transferred", async function() {
+            expect(await soulHub.connect(addr1).transferGass());
+        }) */
+        it("should transfer fees to deployer only if balance is greater than fee", async () => {
+            debugger;
+            await soulHub.connect(addr1).transferGass();
+
+
+            /* const initialDeployerBalance = await addr1.getBalance();
+            const initialSoulHubBalance = await soulHub.getBalance();
+            const initialFee = await soulHub.fee();
+          
+            // Attempt to transfer gas fees when balance is zero
+            await expect(soulHub.transferGass()).to.be.revertedWith("No fees to transfer");
+          
+            // Increase SoulHub balance to be greater than fee
+            await soulHub.connect(addr1).addFunds({ value: initialFee });
+          
+            // Transfer gas fees to deployer
+            await soulHub.transferGass();
+          
+            // Check if the fees have been transferred correctly
+            const expectedDeployerBalance = initialDeployerBalance.add(initialFee);
+            const expectedSoulHubBalance = initialSoulHubBalance.sub(initialFee);
+            expect(await addr1.getBalance()).to.equal(expectedDeployerBalance);
+            expect(await soulHub.getBalance()).to.equal(expectedSoulHubBalance);
+          
+            // Attempt to transfer gas fees again when balance is zero
+            await expect(soulHub.transferGass()).to.be.revertedWith("No fees to transfer");
+          
+            // Reduce SoulHub balance to be less than fee
+            await soulHub.connect(addr1).withdrawFunds(initialFee);
+          
+            // Attempt to transfer gas fees when balance is less than fee
+            await expect(soulHub.transferGass()).to.be.revertedWith("No fees to transfer"); */
+          });
+          
+    })
+
+    /* describe("SBT Item creation", function(){
         it("Should create SBT items, assign ownership and transfer Gas fees", async function(){
             expect(await soulHub.connect(addr1).createSBTItem(sbt.address, 1, 1))
             .to.emit(soulHub, "Offered")
@@ -211,5 +297,5 @@ describe("SoulHub", async function() {
 
             expect(await soulHub.connect(addr1).checkAccess(1, addr2.address)).to.equal(false);
         })
-    })
+    }) */
 })

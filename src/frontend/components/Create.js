@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react';
 import { ethers } from 'ethers';
 import { Row, Form, Button } from 'react-bootstrap'

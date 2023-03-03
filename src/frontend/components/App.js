@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import logo from './logo.png';
 import './App.css';
 import { BrowserRouter, Routes, Route } from "react-router-dom";

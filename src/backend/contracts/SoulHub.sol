@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
 import "./Soul.sol";
 import "./SBT.sol";
@@ -67,6 +68,11 @@ contract SoulHub is ReentrancyGuard {
         address receiver
     );
 
+    event LogMessage(string message, address feeAccountAddress);
+
+    event LogBalance(uint256 balance);
+    event LogFeeAccount(address feeAccount);
+
      //soulId -> soulItems
     mapping (uint => SoulItem) public _soulItems;
 
@@ -93,9 +99,85 @@ contract SoulHub is ReentrancyGuard {
     }
 
     function transferGas() public payable {
-        bool sent = feeAccount.send(fee);
-        require(sent, "Ether not transferred!!!");
+        require(fee > 0, "Must send ether with callFeeAccount function");
+
+        /* if (Address.isContract(feeAccount)) {
+            (bool success, ) = feeAccount.call{value: fee}("");
+            require(success, "Failed to send ether to feeAccount. Check that feeAccount has a fallback function that can receive ether.");
+        } else {
+            emit LogMessage("TEst", feeAccount);
+            revert("feeAccount is not a valid contract address.");
+        } */
+        notDeployer();
+        if (Address.isContract(getDeployer())) {
+            address payable deployer = payable(getDeployer());
+            deployer.transfer(fee);
+        }
+        else {
+            revert("feeAccount is not a valid contract address.");
+        }
+
     }
+
+    /* function transferGass() public payable {
+        uint256 balance = getBalance();
+        require(balance > 0, "No fees to transfer");
+
+        address payable feeAccount = payable(getDeployer());
+
+        if (Address.isContract(feeAccount)) {
+            feeAccount.transfer(msg.value);
+        } else {
+            revert("feeAccount is not a valid contract address.");
+        }
+    } */
+
+    function transferGass() public payable {
+
+        address payable feeAccount = payable(getDeployer());
+
+        bool isContract = isEthereumAddress(feeAccount);
+        require(isContract, "feeAccount is not a valid contract address.");
+
+        uint256 balance = getBalance();
+        require(balance > 0, "No fees to transfer");
+        emit LogBalance(balance);
+        emit LogFeeAccount(address(feeAccount));
+        
+        feeAccount.transfer(fee);
+    }
+
+    function isContract(address _addr) public view returns (bool) {
+        uint size;
+        assembly { size := extcodesize(_addr) }
+        return size > 0;
+    }
+
+    function isEthereumAddress(address addr) public view returns (bool) {
+        return !isContract(addr);
+    }
+
+    /* function transferFees() public payable {
+        require(feeAccount != address(0), "Fee account not set");
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No fees to transfer");
+        payable(feeAccount).transfer(balance);
+    } */
+
+    function getDeployer() public view returns (address) {
+        return feeAccount;
+    }
+
+    function notDeployer() public view {
+        require(msg.sender != feeAccount, "Why is the fucking deployer making the request");
+    }
+    /* fallback() external {
+    } */
+
+    /* function callTransferGas() public {
+        bool boolean = transferGas();
+        require(boolean, "Ethers didn't transfer for fucks sake");
+    } */
 
     //SBT operations
     function createSBTItem(SBT _sbt, uint _sbtId, uint _soulId) public nonReentrant{
