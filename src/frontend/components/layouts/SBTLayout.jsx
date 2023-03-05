@@ -1,9 +1,11 @@
 import SBTCard from "../Cards/SBTCard";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 
 import styles from "./styles.module.scss";
 
-const SBTLayout = () => {
+const SBTLayout = (props) => {
+    const provider = useSelector(state => state.web3.provider);
+    const signer = useSelector(state => state.web3.signer);
     return (
         <>
             <div className={styles.SoulsContainer}>
@@ -21,4 +23,10 @@ const SBTLayout = () => {
     )
 }
 
-export default SBTLayout;
+const mapStateToProps = (state) => ({
+    loggedIn: state.loggedIn,
+    account: state.account,
+    networkId: state.networkId,
+  });
+  
+  export default connect(mapStateToProps)(SBTLayout);

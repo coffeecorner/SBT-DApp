@@ -18,7 +18,7 @@ import SoulsLayout from './layouts/SoulsLayout';
 import SBTLayout from './layouts/SBTLayout';
 import { connect, Provider, useDispatch } from 'react-redux';
 import Reducer from '../utils/redux/Reducer';
-import { login } from '../utils/redux/Action';
+import { login, setProvider } from '../utils/redux/Action';
  
 function App() {
   const [loading, setLoading] = useState(true);
@@ -40,6 +40,9 @@ function App() {
     //Set signer
     const signer = provider.getSigner();
 
+    dispatch(setProvider(provider));
+    dispatch(setProvider(signer));
+
     loadContracts(signer);
   }
 
@@ -56,7 +59,6 @@ function App() {
 
   return (
     <>
-    <Provider store={store}>
       <BrowserRouter>
         <div className='App'>
           <Navigation web3Handler={web3Handler} account={account} />
@@ -84,7 +86,6 @@ function App() {
           )}
         </div>
       </BrowserRouter>
-    </Provider>
     </>
   );
 }
