@@ -3,6 +3,7 @@ import './App.css';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState } from 'react';
 import { ethers } from "ethers";
+import { legacy_createStore as createStore } from 'redux';
 
 import MarketplaceAbi from '../contractsData/Marketplace.json';
 import MarketplaceAddress from '../contractsData/Marketplace-address.json';
@@ -12,19 +13,27 @@ import NFTAddress from '../contractsData/NFT-address.json';
 import Navigation from './Navbar.js';
 import Home from './Home.js';
 import Create from './Create.js';
-import MyListedItems from './MyListedItems.js';
-import MyPurchases from './MyPurchases.js';
 import { Spinner } from 'react-bootstrap';
+import SoulsLayout from './layouts/SoulsLayout';
+import SBTLayout from './layouts/SBTLayout';
+import { connect, Provider, useDispatch } from 'react-redux';
+import Reducer from '../utils/redux/Reducer';
+import { login } from '../utils/redux/Action';
  
 function App() {
   const [loading, setLoading] = useState(true);
   const [account, setAccount] = useState(null);
   const [nft, setNFT] = useState();
   const [marketplace, setMarketplace] = useState({});
+  const store = createStore(Reducer);
+  const dispatch = useDispatch();
+  
   // Metamask Login/connect
   const web3Handler = async () => {
     const accounts = await window.ethereum.request({ method : 'eth_requestAccounts' });
+    const networkId = await window.ethereum.request({ method: 'net_version' });
     setAccount(accounts[0]);
+    dispatch(login(accounts[0], networkId));
     //Get provider from Metamask
     const provider = new ethers.providers.Web3Provider(window.ethereum);
 
@@ -43,31 +52,47 @@ function App() {
     setNFT(nft);
     setLoading(false);
   }
+  
 
   return (
-    <BrowserRouter>
-      <div className='App'>
-        <Navigation web3Handler={web3Handler} account={account} />
-        {loading ? (
-          <div style={{ display:'flex', justifyContent: 'center', alignItems:'center', minHeight:'80vh' }}>
-            <Spinner animation="border" style={{display:'flex'}} />
-            <p className='mx-3 my-0'>Awaiting Metamask Connection...</p>
-          </div>
-        ):(
-        <Routes>
-          <Route path="/" element = {
-            <Home marketplace={marketplace} nft={nft}/>
-          } />
-          <Route path="/create" element={
-            <Create marketplace={marketplace} nft={nft} />
-          }/>
-          <Route path="/my-listed-items"  />
-          <Route path="/my-purchases"/>
-        </Routes>
-        )}
-      </div>
-    </BrowserRouter>
+    <>
+    <Provider store={store}>
+      <BrowserRouter>
+        <div className='App'>
+          <Navigation web3Handler={web3Handler} account={account} />
+          {loading ? (
+            <div style={{ display:'flex', justifyContent: 'center', alignItems:'center', minHeight:'80vh' }}>
+              <Spinner animation="border" style={{display:'flex'}} />
+              <p className='mx-3 my-0'>Awaiting Metamask Connection...</p>
+            </div>
+          ):(
+          <Routes>
+            <Route path="/" element = {
+              <Home marketplace={marketplace} nft={nft}/>
+            } />
+            <Route path="/create" element={
+              <Create marketplace={marketplace} nft={nft} />
+            }/>
+            <Route path="/my-souls" element={
+              <SoulsLayout />
+            } />
+            <Route path="/1/sbt" element={
+              <SBTLayout />
+            } />
+            <Route path="/my-purchases"/>
+          </Routes>
+          )}
+        </div>
+      </BrowserRouter>
+    </Provider>
+    </>
   );
 }
 
-export default App;
+const mapStateToProps = (state) => ({
+  loggedIn: state.loggedIn,
+  account: state.account,
+  networkId: state.networkId,
+});
+
+export default connect(mapStateToProps)(App);

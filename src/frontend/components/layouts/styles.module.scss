@@ -1,0 +1,12 @@
+.SoulsContainer {
+    width: 100%;
+}
+
+.CardsContainer {
+    padding: 20px 50px;
+    gap: 20px; 
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
