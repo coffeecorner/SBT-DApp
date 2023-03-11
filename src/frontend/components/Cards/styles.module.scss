@@ -1,0 +1,12 @@
+.Card {
+    width: 400px !important;
+    flex-basis: 32%;
+
+    .Img {
+        height: 400px !important;
+    }
+}
+
+.card-img, .card-img-bottom {
+    height: 400px !important;
+}

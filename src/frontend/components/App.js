@@ -15,6 +15,9 @@ import Create from './Create.js';
 import MyListedItems from './MyListedItems.js';
 import MyPurchases from './MyPurchases.js';
 import { Spinner } from 'react-bootstrap';
+import SoulsLayout from './layouts/SoulsLayout';
+import SBTLayout from './layouts/SBTLayout';
+import AccessLayout from './layouts/AccessLayout';
  
 function App() {
   const [loading, setLoading] = useState(true);
@@ -42,31 +45,42 @@ function App() {
     const nft = new ethers.Contract(NFTAddress.address, NFTAbi.abi, signer);
     setNFT(nft);
     setLoading(false);
+    localStorage.setItem("isConnectionEstablished", true);
   }
 
   return (
-    <BrowserRouter>
-      <div className='App'>
-        <Navigation web3Handler={web3Handler} account={account} />
-        {loading ? (
-          <div style={{ display:'flex', justifyContent: 'center', alignItems:'center', minHeight:'80vh' }}>
-            <Spinner animation="border" style={{display:'flex'}} />
-            <p className='mx-3 my-0'>Awaiting Metamask Connection...</p>
-          </div>
-        ):(
-        <Routes>
-          <Route path="/" element = {
-            <Home marketplace={marketplace} nft={nft}/>
-          } />
-          <Route path="/create" element={
-            <Create marketplace={marketplace} nft={nft} />
-          }/>
-          <Route path="/my-listed-items"  />
-          <Route path="/my-purchases"/>
-        </Routes>
-        )}
-      </div>
-    </BrowserRouter>
+    <>
+      <BrowserRouter>
+        <div className='App'>
+          <Navigation web3Handler={web3Handler} account={account} />
+          {loading ? (
+            <div style={{ display:'flex', justifyContent: 'center', alignItems:'center', minHeight:'80vh' }}>
+              <Spinner animation="border" style={{display:'flex'}} />
+              <p className='mx-3 my-0'>Awaiting Metamask Connection...</p>
+            </div>
+          ):(
+          <Routes>
+            <Route path="/" element = {
+              <Home marketplace={marketplace} nft={nft}/>
+            } />
+            <Route path="/create" element={
+              <Create marketplace={marketplace} nft={nft} />
+            }/>
+            <Route path="/my-souls" element={
+              <SoulsLayout web3Handler={web3Handler} />
+            } />
+            <Route path="/:soul/sbt" element={
+              <SBTLayout web3Handler={web3Handler} account={account} />
+            } />
+            <Route path="/accesses" element={
+              <AccessLayout web3Handler={web3Handler} />
+            } />
+            <Route path="/my-purchases"/>
+          </Routes>
+          )}
+        </div>
+      </BrowserRouter>
+    </>
   );
 }
 
