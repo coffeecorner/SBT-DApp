@@ -19,6 +19,7 @@ import SBTLayout from './layouts/SBTLayout';
 import { connect, Provider, useDispatch } from 'react-redux';
 import Reducer from '../utils/redux/Reducer';
 import { login, setProvider } from '../utils/redux/Action';
+import AccessLayout from './layouts/AccessLayout';
  
 function App() {
   const [loading, setLoading] = useState(true);
@@ -54,6 +55,7 @@ function App() {
     const nft = new ethers.Contract(NFTAddress.address, NFTAbi.abi, signer);
     setNFT(nft);
     setLoading(false);
+    localStorage.setItem("isConnectionEstablished", true);
   }
   
 
@@ -76,10 +78,13 @@ function App() {
               <Create marketplace={marketplace} nft={nft} />
             }/>
             <Route path="/my-souls" element={
-              <SoulsLayout />
+              <SoulsLayout web3Handler={web3Handler} />
             } />
-            <Route path="/1/sbt" element={
-              <SBTLayout />
+            <Route path="/:soul/sbt" element={
+              <SBTLayout web3Handler={web3Handler} account={account} />
+            } />
+            <Route path="/accesses" element={
+              <AccessLayout web3Handler={web3Handler} />
             } />
             <Route path="/my-purchases"/>
           </Routes>

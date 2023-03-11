@@ -6,7 +6,7 @@ const Navigation = ({web3Handler, account }) => {
     return (
         <Navbar expand='lg' bg="secondary" variant="dark">
             <Container>
-                <Navbar.Brand href = "https://www.google.com">
+                <Navbar.Brand href = "/">
                     <img src="" width="40" height="40" className="" alt="" />
                     &nbsp; SoulHub
                 </Navbar.Brand>

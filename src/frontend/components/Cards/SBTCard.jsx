@@ -1,18 +1,27 @@
-import Card from "react-bootstrap/Card"
+import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button"
+import { Image } from "react-bootstrap";
 
-const SBTCard = () => {
+import styles from "./styles.module.scss";
+
+const SBTCard = ({ props }) => {
+	console.log(props);
     return (
         <>
-            <Card>
-                <Card.Header>Header</Card.Header>
-                <Card.Body>
-                    <Card.Title>Card Title </Card.Title>
-                        <Card.Text>
-                            Some quick example text to build on the card title and make up the
-                            bulk of the card's content.
-                        </Card.Text>
-                </Card.Body>
-            </Card>
+				{props && 
+					<Card className={styles.Card}>
+						{/* <Card.Img variant="top" src={props.imgSrc} /> */}
+						<Card.Img as={Image} src={props.imgSrc} fluid={true} alt="Card image" />
+						<Card.Body>
+							<Card.Title>{props.titile}</Card.Title>
+							<Card.Text>
+								{props.desc}
+							</Card.Text>
+							<Button variant="primary">View Document</Button>
+							<Card.Footer className="text-muted">{props.soul}</Card.Footer>
+						</Card.Body>
+					</Card>
+				}
         </>
     )
 }

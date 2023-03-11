@@ -1,24 +1,40 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import SBTCard from "../Cards/SBTCard";
-import { connect, useSelector } from "react-redux";
+import { connect } from "react-redux";
+import { useEffect, useState } from "react";
+
+import sbtData from "../../data/sbtData";
 
 import styles from "./styles.module.scss";
+import { useParams } from "react-router-dom";
 
-const SBTLayout = (props) => {
-    const provider = useSelector(state => state.web3.provider);
-    const signer = useSelector(state => state.web3.signer);
+const SBTLayout = ({ web3Handler, account}) => {
+    /* useEffect(() => {
+        const connectionValue = localStorage?.getItem("isConnectionEstablished" === true);
+        if (window.ethereum.isConnected()) {
+            web3Handler();
+        }
+    }) */
+    const [soul, setSoul] = useState();
+
+    const router = useParams();
+    useEffect(() => {
+        if (!soul) setSoul(router.soul);
+        console.log(soul);
+    })
+
     return (
         <>
-            <div className={styles.SoulsContainer}>
+            {soul && 
+                <div className={styles.SoulsContainer}>
                 <div className={styles.CardsContainer}>
-                    <SBTCard />
-                    <SBTCard />
-                    <SBTCard />
-                    <SBTCard />
-                    <SBTCard />
-                    <SBTCard />
-                    <SBTCard />
+                    {sbtData.filter((x) => x.soulKeyword === soul).map((data, index) => {
+                        return (
+                            <SBTCard key={index} props={data} />
+                        )
+                    })}
                 </div>
-            </div>
+            </div>}
         </>
     )
 }

@@ -3,18 +3,22 @@ import Button from "react-bootstrap/Button";
 
 import styles from "./styles.module.scss";
 
-const SoulCard = () => {
+const SoulCard = ({ web3Handler, props }) => {
     return (
+      <>
+      {props &&
         <Card className={styles.Card}>
-          <Card.Header>Featured</Card.Header>
           <Card.Body>
-            <Card.Title>Special title treatment</Card.Title>
+            <Card.Title>{props?.Title}</Card.Title>
             <Card.Text>
-              With supporting text below as a natural lead-in to additional content.
+              {props?.Description}
             </Card.Text>
-            <Button variant="outline-dark" href="/1/sbt">Go Somewhere</Button>
+            <Button variant="outline-dark" href={props.route} onClick={web3Handler}>View SBTs</Button>
           </Card.Body>
+          <Card.Footer className="text-muted">{props.Count}</Card.Footer>
         </Card>
+      }
+      </>
     );
 }
 

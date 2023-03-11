@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { Row, Col, Card, Button } from 'react-bootstrap';
+import HomeLayout from './layouts/HomeLayout';
 
 const Home = ({ marketplace, nft }) => {
     const [items, setItems] = useState([]);
@@ -48,13 +49,13 @@ const Home = ({ marketplace, nft }) => {
         loadMarketplaceItems()
     }, [])
 
-    if(loading) return (
+    /* if(loading) return (
         <main style={{padding: "1rem 0"}}>
             <h2>Loading...</h2>
         </main>
-    )
+    ) */
 
-    return (
+    /* return (
         <div className='flex justify-center'>
             {items.length > 0 ? (
                 <div className="px-5 container">
@@ -87,7 +88,13 @@ const Home = ({ marketplace, nft }) => {
                 </main>
             )}
         </div>
-    );
+    ); */
+    
+    return (
+      <>
+        <HomeLayout />
+      </>
+    )
 }
 
 export default Home;
