@@ -20,6 +20,7 @@ import { connect, Provider, useDispatch } from 'react-redux';
 import Reducer from '../utils/redux/Reducer';
 import { login, setProvider } from '../utils/redux/Action';
 import AccessLayout from './layouts/AccessLayout';
+import GrantAccessLayout from './layouts/GrantAccessLayout';
  
 function App() {
   const [loading, setLoading] = useState(true);
@@ -82,6 +83,9 @@ function App() {
             } />
             <Route path="/:soul/sbt" element={
               <SBTLayout web3Handler={web3Handler} account={account} />
+            } />
+            <Route path="/:sbtId/grant-access" element={
+              <GrantAccessLayout web3Handler={web3Handler} account={account} />
             } />
             <Route path="/accesses" element={
               <AccessLayout web3Handler={web3Handler} />

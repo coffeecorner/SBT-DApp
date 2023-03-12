@@ -12,7 +12,7 @@ const HomeLayout = () => {
   return (
     <>
       <div className={styles.HomeLayoutContainer}>
-        <h2>Souls</h2>
+        <h2>Recent Souls</h2>
         <div className={styles.CardsContainer}>
           {soulData.filter((x, filterIndex) => filterIndex < 3).map((data, index) => {
             return (
@@ -22,7 +22,7 @@ const HomeLayout = () => {
             )
           })}
         </div>
-        <h2>SBTs</h2>
+        <h2>Recent SBTs</h2>
         <div className={styles.CardsContainer}>
           {homeSbtData.map((data, index) => {
             return (
