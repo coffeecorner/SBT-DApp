@@ -12,6 +12,7 @@ const Create = ({ marketplace, nft }) => {
     const [price, setPrice] = useState(null);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [option, setOption] = useState();
 
     const uploadToIPFS = async (event) => {
         const url =  `https://api.pinata.cloud/pinning/pinFileToIPFS`;
@@ -124,11 +125,6 @@ const Create = ({ marketplace, nft }) => {
                     <div className='content mx-auto'>
                         <Row className='g-4'>
                             <Form.Control 
-                                type="file" 
-                                name="file" 
-                                onChange={uploadToIPFS}
-                            />
-                            <Form.Control 
                                 onChange={(e) => setName(e.target.value)}
                                 size="lg"
                                 type="text"
@@ -140,15 +136,24 @@ const Create = ({ marketplace, nft }) => {
                                 as="textarea"
                                 placeholder="Description"
                             />
-                            <Form.Control 
-                                onChange={(e) => setPrice(e.target.value)}
-                                size="lg"
-                                type="number"
-                                placeholder="Price in ETH"
-                            />
+                            <Form.Control
+                            as="select"
+                            onChange={e => {
+                                console.log("e.target.value", e.target.value);
+                                setOption(e.target.value);
+                            }}
+                            >
+                                <option>Soul</option>
+                                <option>SBT</option>
+                            </Form.Control>
+                            {option == 'SBT' && <Form.Control 
+                                type="file" 
+                                name="file" 
+                                onChange={uploadToIPFS}
+                            />}
                             <div className='d-grid px-0'>
                                 <Button onClick={createNFT} variant="primary" size="lg">
-                                    Create & List NFT
+                                    Add {option && option}
                                 </Button>
                             </div>
                         </Row>

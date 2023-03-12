@@ -15,7 +15,7 @@ const SoulCard = ({ web3Handler, props }) => {
             </Card.Text>
             <Button variant="outline-dark" href={props.route} onClick={web3Handler}>View SBTs</Button>
           </Card.Body>
-          <Card.Footer className="text-muted">{props.Count}</Card.Footer>
+          <Card.Footer className="text-muted"><b>Count: </b>{props.Count}</Card.Footer>
         </Card>
       }
       </>

@@ -18,6 +18,7 @@ import { Spinner } from 'react-bootstrap';
 import SoulsLayout from './layouts/SoulsLayout';
 import SBTLayout from './layouts/SBTLayout';
 import AccessLayout from './layouts/AccessLayout';
+import GrantAccessLayout from './layouts/GrantAccessLayout';
  
 function App() {
   const [loading, setLoading] = useState(true);
@@ -71,6 +72,9 @@ function App() {
             } />
             <Route path="/:soul/sbt" element={
               <SBTLayout web3Handler={web3Handler} account={account} />
+            } />
+            <Route path="/:sbtId/grant-access" element={
+              <GrantAccessLayout web3Handler={web3Handler} account={account} />
             } />
             <Route path="/accesses" element={
               <AccessLayout web3Handler={web3Handler} />
