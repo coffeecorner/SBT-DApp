@@ -146,7 +146,18 @@ const Create = ({ marketplace, nft }) => {
                                 <option>Soul</option>
                                 <option>SBT</option>
                             </Form.Control>
-                            {option == 'SBT' && <Form.Control 
+                            {option === 'SBT' && <Form.Control
+                            as="select"
+                            onChange={e => {
+                                setOption(e.target.value);
+                            }}
+                            >
+                                <option>Official</option>
+                                <option>Education</option>
+                                <option>Achievements</option>
+                                <option>Tech Achievements</option>
+                            </Form.Control>}
+                            {option === 'SBT' && <Form.Control 
                                 type="file" 
                                 name="file" 
                                 onChange={uploadToIPFS}
