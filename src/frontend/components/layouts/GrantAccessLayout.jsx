@@ -67,7 +67,7 @@ const GrantAccessLayout = () => {
                     Close
                 </Button>
                 <Button variant="primary" onClick={handleClose}>
-                    Save Changes
+                    Provide Access
                 </Button>
                 </Modal.Footer>
             </Modal>
