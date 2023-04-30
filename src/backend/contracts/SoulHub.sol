@@ -93,12 +93,13 @@ contract SoulHub is ReentrancyGuard {
     }
 
     function transferGas() public payable {
-        bool sent = feeAccount.send(fee);
-        require(sent, "Ether not transferred!!!");
+        /* bool sent = feeAccount.send(fee);
+        require(sent, "Ether not transferred!!!"); */
+        feeAccount.transfer(fee);
     }
 
     //SBT operations
-    function createSBTItem(SBT _sbt, uint _sbtId, uint _soulId) public nonReentrant{
+    function createSBTItem(SBT _sbt, uint _sbtId, uint _soulId) public payable nonReentrant{
         //require the sbtId and sbtItemCount to line up
         require(_sbtId == sbtItemCount+1, "Invalid SBT Id number");
 
@@ -127,7 +128,7 @@ contract SoulHub is ReentrancyGuard {
         transferGas();
     } 
 
-    function createSBTItemFor(SBT _sbt, uint _sbtId, uint _soulId, address _mintee) public nonReentrant{
+    function createSBTItemFor(SBT _sbt, uint _sbtId, uint _soulId, address _mintee) public payable nonReentrant{
         //require the sbtId and sbtItemCount to line up
         require(_sbtId == sbtItemCount+1, "Invalid SBT Id number");
 
@@ -236,7 +237,7 @@ contract SoulHub is ReentrancyGuard {
     }
 
     //Soul Operations
-    function createSoulItem(Soul _soul, uint _soulId) public nonReentrant{
+    function createSoulItem(Soul _soul, uint _soulId) public payable nonReentrant{
         //require the soul Item ID and soul 
         require(_soulId == soulItemCount+1, "Invalid Soul ID number");
         

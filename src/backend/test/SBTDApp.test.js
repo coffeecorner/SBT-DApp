@@ -133,25 +133,31 @@ describe("SoulHub", async function() {
 
     describe("SBT Item creation", function(){
         it("Should create SBT items, assign ownership and transfer Gas fees", async function(){
-            expect(await soulHub.connect(addr1).createSBTItem(sbt.address, 1, 1))
+            /* console.log('deployer');
+            console.log(await deployer.getBalance()); */
+
+            expect(await soulHub.connect(addr1).createSBTItem(sbt.address, 1, 1, {value: fee}))
             .to.emit(soulHub, "Offered")
             .withArgs(1,sbt.address,1,1,addr1.address);
 
+            /* console.log('deployer');
+            console.log(await deployer.getBalance()); */
+
             await sbt.connect(addr2).mint(URI);
-            expect(await soulHub.connect(addr2).createSBTItem(sbt.address, 2, 1))
+            expect(await soulHub.connect(addr2).createSBTItem(sbt.address, 2, 1, {value: fee}))
             .to.emit(soulHub, "Offered")
             .withArgs(2,sbt.address,2,1,addr2.address);
             
         })
 
         it("Should create SBT items for another user, transfer ownership and transfer Gas fees", async function(){
-            expect(await soulHub.connect(addr1).createSBTItemFor(sbt.address, 1, 1, addr2.address))
+            expect(await soulHub.connect(addr1).createSBTItemFor(sbt.address, 1, 1, addr2.address, {value: fee}))
             .to.emit(soulHub, "Received")
             .withArgs(1,sbt.address,1,1,addr1.address,addr2.address)
 
             await sbt.connect(addr2).mint(URI);
             await sbt.connect(addr2).setApprovalForAll(soulHub.address, true)
-            expect(await soulHub.connect(addr2).createSBTItemFor(sbt.address, 2, 1, addr3.address))
+            expect(await soulHub.connect(addr2).createSBTItemFor(sbt.address, 2, 1, addr3.address, {value: fee}))
             .to.emit(soulHub, "Received")
             .withArgs(2,sbt.address,2,1,addr2.address,addr3.address)
         })
@@ -160,7 +166,7 @@ describe("SoulHub", async function() {
 
     describe("Soul Item creation", function(){
         it("Should track the creation of a soul", async function() {
-            expect(await soulHub.connect(addr1).createSoulItem(soul.address, 1))
+            expect(await soulHub.connect(addr1).createSoulItem(soul.address, 1, {value: fee}))
             .to.emit(soulHub, "CreatedSoul")
             .withArgs(1,soul.address,addr1.address)
         })
@@ -168,18 +174,18 @@ describe("SoulHub", async function() {
 
     describe("SBT-Soul relationship tracking", function(){
         it("Should keep track of the SBTs associated with every soul", async function(){
-            await soulHub.connect(addr1).createSBTItem(sbt.address, 1, 1)
+            await soulHub.connect(addr1).createSBTItem(sbt.address, 1, 1, {value: fee})
             
             //addr2 creates a soul with id 2 and name "Internship"
             await soul.connect(addr2).createSoul("Internship");
 
             //addr2 mints an SBT and creates SBT item for the id 2
             await sbt.connect(addr2).mint(URI);
-            await soulHub.connect(addr2).createSBTItem(sbt.address, 2, 2)
+            await soulHub.connect(addr2).createSBTItem(sbt.address, 2, 2, {value: fee})
 
             //addr2 mints an SBT and creates SBT item for id 3
             await sbt.connect(addr2).mint(URI);
-            await soulHub.connect(addr2).createSBTItem(sbt.address, 3, 2)
+            await soulHub.connect(addr2).createSBTItem(sbt.address, 3, 2, {value: fee})
 
 
             expect(await soulHub.getSoulContentCount(1)).to.equal(1);
@@ -189,7 +195,7 @@ describe("SoulHub", async function() {
 
     describe("Access permission tracking", function(){
         it("Should be able to grant and check access permission", async function(){
-            await soulHub.connect(addr1).createSBTItem(sbt.address, 1, 1)
+            await soulHub.connect(addr1).createSBTItem(sbt.address, 1, 1, {value: fee})
 
             expect(await soulHub.connect(addr1).grantAccess(sbt.address, 1, addr2.address))
             .to.emit(soulHub, "AccessGranted")
@@ -199,7 +205,7 @@ describe("SoulHub", async function() {
         })
 
         it("Should be able to revoke and check access permission", async function(){
-            await soulHub.connect(addr1).createSBTItem(sbt.address, 1, 1)
+            await soulHub.connect(addr1).createSBTItem(sbt.address, 1, 1, {value: fee})
 
             expect(await soulHub.connect(addr1).grantAccess(sbt.address, 1, addr2.address))
             .to.emit(soulHub, "AccessGranted")
