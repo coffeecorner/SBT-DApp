@@ -7,12 +7,13 @@ import FormData from 'form-data';
 const key = "e2267be43329d3b6ab87";
 const secret = "a2ac0749184057d7dd6b7a9ef73b9c123385617b93250a16787ad8bfbb7bc553";
 
-const Create = ({ marketplace, nft }) => {
+const Create = ({ marketplace, nft, soulHub, soul, sbt }) => {
     const [fileURL, setFileURL] = useState('');
-    const [price, setPrice] = useState(null);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [soulName, setSoulName] = useState('');
     const [option, setOption] = useState();
+    const [objType, setObjType] = useState('');
 
     const uploadToIPFS = async (event) => {
         const url =  `https://api.pinata.cloud/pinning/pinFileToIPFS`;
@@ -28,7 +29,7 @@ const Create = ({ marketplace, nft }) => {
                 name : name,
                 keyvalues: {
                     description : description,
-                    price: 2
+                    soul: soulName
                 }
             })
             data.append('pinataMetadata', metadata);
@@ -66,17 +67,17 @@ const Create = ({ marketplace, nft }) => {
         
     }
     
-    const createNFT = async () => {
-        if (!fileURL || !price || !name || !description) return;
+    const createSBT = async () => {
+        if (!fileURL || !soulName || !name || !description) return;
         
-        const nftJSON = {
-            name, description, price, file: fileURL
+        const sbtJSON = {
+            name, description, soulName, file: fileURL
         }
 
         const url =  `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
         
         return axios
-            .post(url, nftJSON, {
+            .post(url, sbtJSON, {
                 headers: {
                     pinata_api_key: key,
                     pinata_secret_api_key: secret
@@ -102,20 +103,27 @@ const Create = ({ marketplace, nft }) => {
     const mintThenList = async (response) => {
         const uri = "https://gateway.pinata.cloud/ipfs/" + response.data.IpfsHash;
 
-        //mint nft
-        await (await nft.mint(uri)).wait();
+        //mint sbt
+        await (await sbt.mint(uri)).wait();
 
-        //get tokenId of new nft
-        const id = await nft.tokenCount()
+        //get tokenId of new sbt
+        const id = await sbt.tokenCount()
 
-        //approve marketplace to spend nft
-        await (await nft.setApprovalForAll(marketplace.address, true)).wait()
+        //approve soulHub to spend sbt
+        await (await sbt.setApprovalForAll(soulHub.address, true)).wait()
 
-        //add nft to marketplace
-        const listingPrice = ethers.utils.parseEther(price.toString());
-        const result = await (await marketplace.makeItem(nft.address, id, listingPrice)).wait();
+        //add sbt to soulHub
+        const result = await (await soulHub.createSBTItem(sbt.address, id, id)).wait();
         console.log("listed");
         return result;
+    }
+
+    const loadSouls = async () => {
+
+    }
+
+    const createSoul = async () => {
+
     }
 
     return (
@@ -130,12 +138,14 @@ const Create = ({ marketplace, nft }) => {
                                 type="text"
                                 placeholder="Name"
                             />
+
                             <Form.Control 
                                 onChange={(e) => setDescription(e.target.value)}
                                 size="lg"
                                 as="textarea"
                                 placeholder="Description"
                             />
+
                             <Form.Control
                             as="select"
                             onChange={e => {
@@ -146,10 +156,11 @@ const Create = ({ marketplace, nft }) => {
                                 <option>Soul</option>
                                 <option>SBT</option>
                             </Form.Control>
+
                             {option === 'SBT' && <Form.Control
                             as="select"
                             onChange={e => {
-                                setOption(e.target.value);
+                                setSoulName(e.target.value);
                             }}
                             >
                                 <option>Official</option>
@@ -157,13 +168,15 @@ const Create = ({ marketplace, nft }) => {
                                 <option>Achievements</option>
                                 <option>Tech Achievements</option>
                             </Form.Control>}
+
                             {option === 'SBT' && <Form.Control 
                                 type="file" 
                                 name="file" 
                                 onChange={uploadToIPFS}
                             />}
+
                             <div className='d-grid px-0'>
-                                <Button onClick={createNFT} variant="primary" size="lg">
+                                <Button onClick={option === 'SBT' ? createSBT : createSoul} variant="primary" size="lg">
                                     Add {option && option}
                                 </Button>
                             </div>
