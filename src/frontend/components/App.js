@@ -4,10 +4,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState } from 'react';
 import { ethers } from "ethers";
 
-import MarketplaceAbi from '../contractsData/Marketplace.json';
-import MarketplaceAddress from '../contractsData/Marketplace-address.json';
-import NFTAbi from '../contractsData/NFT.json';
-import NFTAddress from '../contractsData/NFT-address.json';
+import SBTAbi from '../contractsData/SBT.json';
+import SBTAddress from '../contractsData/SBT-address.json';
+import SoulAbi from '../contractsData/Soul.json';
+import SoulAddress from '../contractsData/Soul-address.json';
+import SoulHubAbi from '../contractsData/SoulHub.json';
+import SoulHubAddress from '../contractsData/SoulHub-address.json';
 
 import Navigation from './Navbar.js';
 import Home from './Home.js';
@@ -23,8 +25,11 @@ import GrantAccessLayout from './layouts/GrantAccessLayout';
 function App() {
   const [loading, setLoading] = useState(true);
   const [account, setAccount] = useState(null);
-  const [nft, setNFT] = useState();
-  const [marketplace, setMarketplace] = useState({});
+
+  const [sbt, setSBT] = useState();
+  const [soul, setSoul] = useState();
+  const [soulHub, setSoulHub] = useState();
+
   // Metamask Login/connect
   const web3Handler = async () => {
     const accounts = await window.ethereum.request({ method : 'eth_requestAccounts' });
@@ -40,11 +45,15 @@ function App() {
 
   const loadContracts = async (signer) => {
     //Get deployed copies of contracts
-    const marketplace = new ethers.Contract(MarketplaceAddress.address, MarketplaceAbi.abi, signer);
-    setMarketplace(marketplace);
+    const SBT = new ethers.Contract(SBTAddress.address, SBTAbi.abi, signer);
+    setSBT(SBT);
 
-    const nft = new ethers.Contract(NFTAddress.address, NFTAbi.abi, signer);
-    setNFT(nft);
+    const Soul = new ethers.Contract(SoulAddress.address, SoulAbi.abi, signer);
+    setSoul(Soul);
+
+    const SoulHub = new ethers.Contract(SoulHubAddress.address, SoulHubAbi.abi, signer);
+    setSoulHub(SoulHub);
+
     setLoading(false);
     localStorage.setItem("isConnectionEstablished", true);
   }
@@ -62,10 +71,10 @@ function App() {
           ):(
           <Routes>
             <Route path="/" element = {
-              <Home marketplace={marketplace} nft={nft}/>
+              <Home />
             } />
             <Route path="/create" element={
-              <Create marketplace={marketplace} nft={nft} />
+              <Create  />
             }/>
             <Route path="/my-souls" element={
               <SoulsLayout web3Handler={web3Handler} />

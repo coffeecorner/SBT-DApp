@@ -128,15 +128,15 @@ describe("SoulHub", async function() {
 
     describe("Gas fee transfer", function() {
         it("Should track if the gas is being transferred", async function() {
-            let sendInitialBalance = await addr1.getBalance();
-            let feeAccInitialBalance = await deployer.getBalance();
+            // let sendInitialBalance = await addr1.getBalance();
+            // let feeAccInitialBalance = await deployer.getBalance();
 
             expect(await soulHub.transferGas({value: feeInWei}));
 
-            let sendFinalBalance = await addr1.getBalance();
-            let feeAccFinalBalance = await deployer.getBalance();
-            console.log("deployer:",feeAccInitialBalance," ",feeAccFinalBalance);
-            console.log("addr1:", sendInitialBalance," ", sendFinalBalance);
+            // let sendFinalBalance = await addr1.getBalance();
+            // let feeAccFinalBalance = await deployer.getBalance();
+            // console.log("deployer:",feeAccInitialBalance," ",feeAccFinalBalance);
+            // console.log("addr1:", sendInitialBalance," ", sendFinalBalance);
         })
     })
 
