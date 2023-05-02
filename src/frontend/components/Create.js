@@ -119,10 +119,47 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt }) => {
     }
 
     const loadSouls = async () => {
+        const soulCount = await soul.getSoulCount();
+        let items = [];
 
+        for(let i=1; i<=soulCount; i++){
+            
+        }
+        
     }
 
     const createSoul = async () => {
+        var data = JSON.stringify({
+            "pinataOptions": {
+              "cidVersion": 1
+            },
+            "pinataMetadata": {
+              "name": name,
+              "keyvalues": {
+                "type": "Soul"
+              }
+            },
+            "pinataContent": {
+                "id": 1,                //hardcoded
+                "name": name,
+                "description": description
+              }
+          });
+
+          var config = {
+            method: 'post',
+            url: 'https://api.pinata.cloud/pinning/pinJSONToIPFS',
+            headers: { 
+              'Content-Type': 'application/json', 
+              pinata_api_key: key,
+              pinata_secret_api_key: secret,
+            },
+            data : data
+          };
+          
+          const res = await axios(config);
+          
+          console.log(res.data);
 
     }
 
