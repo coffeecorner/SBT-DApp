@@ -8,7 +8,6 @@ import "./SBT.sol";
 
 contract SoulHub is ReentrancyGuard {
     //state variables
-    address payable public immutable feeAccount; //the account that receives fees
     uint public immutable fee; //the fee percentage on sales
     uint public soulItemCount;
     uint public sbtItemCount;
@@ -83,18 +82,12 @@ contract SoulHub is ReentrancyGuard {
     mapping(address => uint[]) public _activeSBTs;
 
     constructor(uint _fee){
-        feeAccount = payable(msg.sender);
         fee = _fee;
     }
 
     //application functions
     function getBalance() public view returns(uint) {
         return msg.sender.balance; 
-    }
-
-    function transferGas() public payable {
-        bool sent = feeAccount.send(fee);
-        require(sent, "Ether not transferred!!!"); 
     }
 
     //SBT operations
@@ -124,7 +117,6 @@ contract SoulHub is ReentrancyGuard {
             msg.sender
         );
 
-        transferGas();
     } 
 
     function createSBTItemFor(SBT _sbt, uint _sbtId, uint _soulId, address _mintee) public payable nonReentrant{
@@ -165,7 +157,6 @@ contract SoulHub is ReentrancyGuard {
             _mintee            
         );
 
-        transferGas();
     }
 
     //SBT accesses
@@ -257,7 +248,6 @@ contract SoulHub is ReentrancyGuard {
             msg.sender           
         );
 
-        transferGas();
     } 
 
     function getSoulContentCount(uint _soulId) public view returns(uint) {

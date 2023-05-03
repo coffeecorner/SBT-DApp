@@ -17,7 +17,7 @@ contract Soul is ReentrancyGuard {
     mapping(uint256 => address) private _owners;
 
     // Mapping from soul ID to name of the soul
-    mapping(uint256 => string) _soulNames;
+    mapping(uint256 => string) private _soulNames;
 
     // Mapping owner address to the count of souls they own
     //mapping(address => uint256) private _soulBalances;

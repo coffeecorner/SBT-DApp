@@ -71,10 +71,10 @@ function App() {
           ):(
           <Routes>
             <Route path="/" element = {
-              <Home />
+              <Home web3Handler={web3Handler} />
             } />
             <Route path="/create" element={
-              <Create  />
+              <Create web3Handler={web3Handler} soulHub={soulHub} soul={soul} sbt={sbt} account={account}/>
             }/>
             <Route path="/my-souls" element={
               <SoulsLayout web3Handler={web3Handler} />

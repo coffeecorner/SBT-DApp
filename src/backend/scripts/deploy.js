@@ -16,7 +16,7 @@ async function main() {
   const soul = await Soul.deploy("Soul");
 
   //let fee = toWei(0.002);
-  let fee = toWei(0.002);
+  let fee = toWei(0.02);
   const SoulHub = await ethers.getContractFactory("SoulHub");
   const soulhub = await SoulHub.deploy(fee);
 

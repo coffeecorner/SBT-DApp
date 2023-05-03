@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { Row, Form, Button } from 'react-bootstrap'
 import axios from 'axios';
@@ -7,13 +7,14 @@ import FormData from 'form-data';
 const key = "e2267be43329d3b6ab87";
 const secret = "a2ac0749184057d7dd6b7a9ef73b9c123385617b93250a16787ad8bfbb7bc553";
 
-const Create = ({ marketplace, nft, soulHub, soul, sbt }) => {
+const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
     const [fileURL, setFileURL] = useState('');
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [soulName, setSoulName] = useState('');
-    const [option, setOption] = useState();
+    const [option, setOption] = useState('Soul');
     const [objType, setObjType] = useState('');
+    const [soulsArray, setSoulsArray] = useState();
 
     const uploadToIPFS = async (event) => {
         const url =  `https://api.pinata.cloud/pinning/pinFileToIPFS`;
@@ -120,13 +121,23 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt }) => {
 
     const loadSouls = async () => {
         const soulCount = await soul.getSoulCount();
-        let items = [];
+        let souls = []
 
         for(let i=1; i<=soulCount; i++){
-            
+            const soulOwner = await soul.getOwner(i);
+            if (soulOwner.toLowerCase() === account) {
+                const soulname = await soul.getSoulName(i);
+                souls.push(soulname);
+            }
         }
+
+        setSoulsArray(souls);
         
     }
+
+    useEffect(() => {
+        loadSouls();
+    }, []);
 
     const createSoul = async () => {
         var data = JSON.stringify({
@@ -158,9 +169,22 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt }) => {
           };
           
           const res = await axios(config);
+          mintSoul(res);
           
           console.log(res.data);
 
+    }
+
+    const mintSoul = async (response) => {
+        const uri = "https://gateway.pinata.cloud/ipfs/" + response.data.IpfsHash;
+
+        await (await soul.createSoul(name)).wait();
+
+        const id = await soul.getSoulCount();
+
+        const result = await (await soulHub.createSoulItem(soul.address, id));
+        console.log("Soul listed");
+        return result;
     }
 
     return (
@@ -194,16 +218,17 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt }) => {
                                 <option>SBT</option>
                             </Form.Control>
 
-                            {option === 'SBT' && <Form.Control
+                            {option == 'SBT' && <Form.Control
                             as="select"
                             onChange={e => {
                                 setSoulName(e.target.value);
                             }}
                             >
-                                <option>Official</option>
-                                <option>Education</option>
-                                <option>Achievements</option>
-                                <option>Tech Achievements</option>
+                                {soulsArray?.map((element, index) => {
+                                    return (
+                                        <option key={index}>{element}</option>
+                                    )
+                                })}
                             </Form.Control>}
 
                             {option === 'SBT' && <Form.Control 
@@ -217,6 +242,8 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt }) => {
                                     Add {option && option}
                                 </Button>
                             </div>
+
+                            <Button onClick={(e) => loadSouls()}>Button</Button>
                         </Row>
                     </div>
                 </main>
