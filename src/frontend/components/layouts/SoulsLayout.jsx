@@ -18,7 +18,7 @@ const SoulsLayout = (data) => {
             if (soulOwner.toLowerCase() === account) {
                 const soulname = await soul.getSoulName(i);
                 const sbtCount = await soulHub.getSoulContentCount(i);
-                souls.push({soulName: soulname, sbtCount: sbtCount.toNumber()});
+                souls.push({soulName: soulname, sbtCount: sbtCount.toNumber(), id: i});
             }
         }
 

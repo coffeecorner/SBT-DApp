@@ -102,7 +102,7 @@ contract SoulHub is ReentrancyGuard {
         _sbtItems[sbtItemCount] = SBTItem (
             _sbtId,
             _sbt,
-            sbtItemCount,
+            _soulId,
             payable(msg.sender)
         );
 

@@ -17,25 +17,36 @@ const SBTLayout = (data) => {
         }
     }) */
     const { soulHub, soul, account, sbt } = data;
-    const [soulName, setSoul] = useState();
+    const [soulId, setSoul] = useState();
     const [sbtArray, setSbtArray] = useState();
 
     const router = useParams();
     useEffect(() => {
-        if (!soulName) setSoul(router.soul);
+        if (!soulId) setSoul(router?.soul);
         //console.log(soul);
-    })
+    }, [])
 
     const loadSBTs = async () => {
         const sbtCount = await sbt.tokenCount();
+        const currentSoulId = soulId
         let sbts = [];
 
         for (let i = 1; i <= sbtCount; i++) {
             const sbtItem = await soulHub._sbtItems(i);
-            const sbtUri = await sbt.tokenURI(sbtItem.tokenId);
-
-            const response = await fetch(sbtUri);
-            sbts.push(await response.json());
+            console.log(sbtItem);
+            console.log(sbtItem.soulItemId.toNumber(), " ", Number(soulId));
+            console.log(sbtItem.soulItemId.toNumber() == Number(soulId))
+            if (sbtItem.soulItemId.toNumber() == Number(currentSoulId)) {
+                const sbtUri = await sbt.tokenURI(sbtItem.tokenId);
+                const response = await fetch(sbtUri, {
+                    method: 'GET',
+                    headers: {
+                        'Access-Control-Allow-Origin': 'http://localhost:3000' // your domain here
+                    }
+                });
+                sbts.push(await response.json());
+            }
+            
         }
 
         setSbtArray(sbts);
@@ -43,7 +54,7 @@ const SBTLayout = (data) => {
 
     useEffect(() => {
         loadSBTs();
-    }, []);
+    });
 
     return (
         <>
