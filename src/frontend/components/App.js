@@ -77,10 +77,10 @@ function App() {
               <Create web3Handler={web3Handler} soulHub={soulHub} soul={soul} sbt={sbt} account={account}/>
             }/>
             <Route path="/my-souls" element={
-              <SoulsLayout web3Handler={web3Handler} />
+              <SoulsLayout web3Handler={web3Handler} soulHub={soulHub} soul={soul} sbt={sbt} account={account}/>
             } />
-            <Route path="/:soul/sbt" element={
-              <SBTLayout web3Handler={web3Handler} account={account} />
+            <Route path="/:soul" element={
+              <SBTLayout web3Handler={web3Handler} account={account} soulHub={soulHub} soul={soul} sbt={sbt} />
             } />
             <Route path="/:sbtId/grant-access" element={
               <GrantAccessLayout web3Handler={web3Handler} account={account} />

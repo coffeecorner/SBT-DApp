@@ -7,42 +7,47 @@ import sbtData from "../../data/sbtData";
 
 import styles from "./styles.module.scss";
 import { useParams } from "react-router-dom";
+import { Button } from "react-bootstrap";
 
-const SBTLayout = ({ web3Handler, account}) => {
+const SBTLayout = (data) => {
     /* useEffect(() => {
         const connectionValue = localStorage?.getItem("isConnectionEstablished" === true);
         if (window.ethereum.isConnected()) {
             web3Handler();
         }
     }) */
-    const [soul, setSoul] = useState();
+    const { soulHub, soul, account, sbt } = data;
+    const [soulName, setSoul] = useState();
 
     const router = useParams();
     useEffect(() => {
-        if (!soul) setSoul(router.soul);
-        console.log(soul);
+        if (!soulName) setSoul(router.soul);
+        //console.log(soul);
     })
+
+    const loadSBTs = async () => {
+        const sbtCount = await sbt.tokenCount();
+        let sbts = [];
+
+        const sbtMapping = await soulHub._sbtItems(1);
+        console.log(sbtMapping);
+    }
 
     return (
         <>
             {soul && 
                 <div className={styles.SoulsContainer}>
                 <div className={styles.CardsContainer}>
-                    {sbtData.filter((x) => x.soulKeyword === soul).map((data, index) => {
+                    {sbtData.filter((x) => x.soulKeyword === soulName).map((data, index) => {
                         return (
                             <SBTCard key={index} props={data} />
                         )
                     })}
                 </div>
+                <Button onClick={loadSBTs}>button</Button>
             </div>}
         </>
     )
 }
 
-const mapStateToProps = (state) => ({
-    loggedIn: state.loggedIn,
-    account: state.account,
-    networkId: state.networkId,
-  });
-  
-  export default connect(mapStateToProps)(SBTLayout);
+export default SBTLayout

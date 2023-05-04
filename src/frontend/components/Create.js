@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { ethers } from 'ethers';
 import { Row, Form, Button } from 'react-bootstrap'
 import axios from 'axios';
 import FormData from 'form-data';
@@ -11,10 +10,13 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
     const [fileURL, setFileURL] = useState('');
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [soulName, setSoulName] = useState('');
     const [option, setOption] = useState('Soul');
-    const [objType, setObjType] = useState('');
     const [soulsArray, setSoulsArray] = useState();
+    const [soulName, setSoulName] = useState(soulsArray && soulsArray[0]);
+
+    useEffect(() => {
+        loadSouls();
+    });
 
     const uploadToIPFS = async (event) => {
         const url =  `https://api.pinata.cloud/pinning/pinFileToIPFS`;
@@ -35,10 +37,10 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
             })
             data.append('pinataMetadata', metadata);
 
-            const pinataOptions = JSON.stringify({
+            /* const pinataOptions = JSON.stringify({
                 cidVersion : 1,
                 wrapWithDirectory: false
-            })
+            }) */
 
             return axios.post(url, data, {
                     maxBodyLength: 'Infinity',
@@ -69,7 +71,7 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
     }
     
     const createSBT = async () => {
-        if (!fileURL || !soulName || !name || !description) return;
+        if (!fileURL || !soulName || !name || !description) return alert('Missing data');
         
         const sbtJSON = {
             name, description, soulName, file: fileURL
@@ -85,7 +87,7 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
                 }
             })
             .then(async function (response){
-                const mint = await mintThenList(response);
+                await mintThenList(response);
                 console.log("successfully listed");
                 return {
                     success: true,
@@ -135,11 +137,13 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
         
     }
 
-    useEffect(() => {
-        loadSouls();
-    }, []);
-
     const createSoul = async () => {
+        if (!name /* || !description */) return alert('Missing data');
+
+        const id = await soul.getSoulCount();
+        /* console.log(id.toNumber());
+        debugger; */
+
         var data = JSON.stringify({
             "pinataOptions": {
               "cidVersion": 1
@@ -151,7 +155,7 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
               }
             },
             "pinataContent": {
-                "id": 1,                //hardcoded
+                "id": (id.toNumber() + 1),
                 "name": name,
                 "description": description
               }
@@ -171,18 +175,18 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
           const res = await axios(config);
           mintSoul(res);
           
-          console.log(res.data);
+          console.log(res?.data);
 
     }
 
     const mintSoul = async (response) => {
-        const uri = "https://gateway.pinata.cloud/ipfs/" + response.data.IpfsHash;
+        /* const uri = "https://gateway.pinata.cloud/ipfs/" + response?.data?.IpfsHash; */
 
-        await (await soul.createSoul(name)).wait();
+        await (await soul?.createSoul(name)).wait();
 
-        const id = await soul.getSoulCount();
+        const id = await soul?.getSoulCount();
 
-        const result = await (await soulHub.createSoulItem(soul.address, id));
+        const result = await (await soulHub.createSoulItem(soul?.address, id));
         console.log("Soul listed");
         return result;
     }
@@ -197,14 +201,14 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
                                 onChange={(e) => setName(e.target.value)}
                                 size="lg"
                                 type="text"
-                                placeholder="Name"
+                                placeholder="Name*"
                             />
 
                             <Form.Control 
                                 onChange={(e) => setDescription(e.target.value)}
                                 size="lg"
                                 as="textarea"
-                                placeholder="Description"
+                                placeholder="Description*"
                             />
 
                             <Form.Control
@@ -218,7 +222,7 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
                                 <option>SBT</option>
                             </Form.Control>
 
-                            {option == 'SBT' && <Form.Control
+                            {option === 'SBT' && <Form.Control
                             as="select"
                             onChange={e => {
                                 setSoulName(e.target.value);
