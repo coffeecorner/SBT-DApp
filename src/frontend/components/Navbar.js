@@ -19,6 +19,7 @@ const Navigation = ({web3Handler, account }) => {
                         <Nav.Link className={styles.navbarLinks} as={Link} to="/create">Create</Nav.Link>
                         <Nav.Link className={styles.navbarLinks} as={Link} to="/my-souls">My Souls</Nav.Link>
                         <Nav.Link className={styles.navbarLinks} as={Link} to="/accesses">Accesses</Nav.Link>
+                        <Nav.Link className={styles.navbarLinks} as={Link} to="/new-sbts">New SBTs</Nav.Link>
                     </Nav>
                     <Nav>
                         {account ? (

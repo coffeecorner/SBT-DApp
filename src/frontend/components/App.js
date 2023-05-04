@@ -19,6 +19,7 @@ import SoulsLayout from './layouts/SoulsLayout';
 import SBTLayout from './layouts/SBTLayout';
 import AccessLayout from './layouts/AccessLayout';
 import GrantAccessLayout from './layouts/GrantAccessLayout';
+import PendingSBTsLayout from './layouts/PendingSBTsLayout';
  
 function App() {
   const [loading, setLoading] = useState(true);
@@ -85,6 +86,9 @@ function App() {
             } />
             <Route path="/accesses" element={
               <AccessLayout web3Handler={web3Handler} />
+            } />
+            <Route path="/new-sbts" element={
+              <PendingSBTsLayout web3Handler={web3Handler} account={account} sbt={sbt} soulHub={soulHub} soul={soul} />
             } />
             <Route path="/my-purchases"/>
           </Routes>

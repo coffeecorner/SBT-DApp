@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Row, Form, Button } from 'react-bootstrap'
+import { Row, Form, Button, ButtonGroup, ToggleButton } from 'react-bootstrap'
 import axios from 'axios';
 import FormData from 'form-data';
+
+import styles from "./styles.module.scss";
 
 const key = "e2267be43329d3b6ab87";
 const secret = "a2ac0749184057d7dd6b7a9ef73b9c123385617b93250a16787ad8bfbb7bc553";
@@ -12,7 +14,10 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
     const [description, setDescription] = useState('');
     const [option, setOption] = useState('Soul');
     const [soulsArray, setSoulsArray] = useState();
-    const [soulName, setSoulName] = useState(soulsArray && soulsArray[0]);
+    const [soulName, setSoulName] = useState(soulsArray && soulsArray[0].soulName);
+    const [soulId, setSoulId] = useState(soulsArray && soulsArray[0].id)
+    const [checked, setChecked] = useState(false);
+    const [ownerAddress, setOwnerAddress] = useState();
 
     useEffect(() => {
         loadSouls();
@@ -71,6 +76,7 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
     }
     
     const createSBT = async () => {
+        console.log(fileURL, " ", soulName, " ", name, " ", description)
         if (!fileURL || !soulName || !name || !description) return alert('Missing data');
         
         const sbtJSON = {
@@ -116,7 +122,7 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
         await (await sbt.setApprovalForAll(soulHub.address, true)).wait()
 
         //add sbt to soulHub
-        const result = await (await soulHub.createSBTItem(sbt.address, id, id)).wait();
+        const result = await (await soulHub.createSBTItem(sbt.address, id, soulId)).wait();
         console.log("listed");
         return result;
     }
@@ -129,12 +135,11 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
             const soulOwner = await soul.getOwner(i);
             if (soulOwner.toLowerCase() === account) {
                 const soulname = await soul.getSoulName(i);
-                souls.push(soulname);
+                souls.push({id: i, soulName: soulname});
             }
         }
 
         setSoulsArray(souls);
-        
     }
 
     const createSoul = async () => {
@@ -222,18 +227,41 @@ const Create = ({ marketplace, nft, soulHub, soul, sbt, account }) => {
                                 <option>SBT</option>
                             </Form.Control>
 
-                            {option === 'SBT' && <Form.Control
+                            {option === 'SBT' && <ButtonGroup className={styles.btn}>
+                                <ToggleButton
+                                id="toggle-check"
+                                type="checkbox"
+                                variant="outline-primary"
+                                checked={checked}
+                                value="1"
+                                onChange={(e) => setChecked(e.currentTarget.checked)}
+                                >
+                                Not for me
+                                </ToggleButton>
+                            </ButtonGroup>}
+
+                            {option === 'SBT' && !checked && <Form.Control
                             as="select"
                             onChange={e => {
-                                setSoulName(e.target.value);
+                                const selectedOption = soulsArray.find(element => element.soulName === e.target.value);
+                                setSoulId(selectedOption.id);
+                                setSoulName(selectedOption.soulName);
                             }}
                             >
-                                {soulsArray?.map((element, index) => {
+                                {soulsArray?.map((element) => {
                                     return (
-                                        <option key={index}>{element}</option>
+                                        <option onClick={() => setSoulId(element?.id)} key={element?.id}>{element?.soulName}</option>
                                     )
                                 })}
                             </Form.Control>}
+
+                            {checked && option === 'SBT' && 
+                            <Form.Control
+                                onChange={(e) => setOwnerAddress(e.target.value)}
+                                size="lg"
+                                type="text"
+                                placeholder="Owner Address*"
+                            />}
 
                             {option === 'SBT' && <Form.Control 
                                 type="file" 

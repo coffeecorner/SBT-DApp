@@ -1,30 +1,12 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import axios from "axios";
-import { connect } from "react-redux";
-import { Button } from "react-bootstrap";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 
-import SBTCard from "../Cards/SBTCard";
-import sbtData from "../../data/sbtData";
-import styles from "./styles.module.scss";
+import styles from "./styles.module.scss"
+import PendingSBTCard from "../Cards/PendingSBTCard";
 
-const SBTLayout = (data) => {
-    /* useEffect(() => {
-        const connectionValue = localStorage?.getItem("isConnectionEstablished" === true);
-        if (window.ethereum.isConnected()) {
-            web3Handler();
-        }
-    }) */
-    const { soulHub, soul, account, sbt } = data;
-    const [soulName, setSoul] = useState();
+const PendingSBTsLayout = (props) => {
+    const { soulHub, sbt, soul } = props;
+
     const [sbtArray, setSbtArray] = useState();
-
-    const router = useParams();
-    useEffect(() => {
-        if (!soulName) setSoul(router.soul);
-        //console.log(soul);
-    })
 
     const loadSBTs = async () => {
         const sbtCount = await sbt.tokenCount();
@@ -47,12 +29,12 @@ const SBTLayout = (data) => {
 
     return (
         <>
-            {soul && 
+            {sbtArray &&  
                 <div className={styles.SoulsContainer}>
                 <div className={styles.CardsContainer}>
                     {sbtArray?.map((data, index) => {
                         return (
-                            <SBTCard key={index} props={data} />
+                            <PendingSBTCard key={index} data={data} soul={soul} soulHub={soulHub} propsData={props} />
                         )
                     })}
                     {/* {sbtArray.map((x) => x.soulKeyword === soulName).map((data, index) => {
@@ -66,4 +48,4 @@ const SBTLayout = (data) => {
     )
 }
 
-export default SBTLayout
+export default PendingSBTsLayout;
