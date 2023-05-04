@@ -14,8 +14,6 @@ import SoulHubAddress from '../contractsData/SoulHub-address.json';
 import Navigation from './Navbar.js';
 import Home from './Home.js';
 import Create from './Create.js';
-import MyListedItems from './MyListedItems.js';
-import MyPurchases from './MyPurchases.js';
 import { Spinner } from 'react-bootstrap';
 import SoulsLayout from './layouts/SoulsLayout';
 import SBTLayout from './layouts/SBTLayout';
@@ -83,7 +81,7 @@ function App() {
               <SBTLayout web3Handler={web3Handler} account={account} soulHub={soulHub} soul={soul} sbt={sbt} />
             } />
             <Route path="/:sbtId/grant-access" element={
-              <GrantAccessLayout web3Handler={web3Handler} account={account} />
+              <GrantAccessLayout web3Handler={web3Handler} soulHub={soulHub} soul={soul} sbt={sbt} account={account} />
             } />
             <Route path="/accesses" element={
               <AccessLayout web3Handler={web3Handler} />
